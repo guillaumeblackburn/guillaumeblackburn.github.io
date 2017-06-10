@@ -1,0 +1,84 @@
+<!--https://developers.google.com/maps/documentation/javascript/-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+       #map {
+        height: 800px;
+        width: 100%;
+       }
+    </style>
+  </head>
+  <body>
+
+    <div id="map"></div>
+    <script>
+      function initMap() {
+      
+        var uluru = [
+			{date: '17-Apr', lng: -79.5167, lat: 8.6500},
+			{date: '21-Apr', lng: -84.4667, lat: 2.4667},
+			{date: '25-Apr', lng: -92.4500, lat: -3.6500},
+			{date: '29-Apr', lng: -103.7000, lat: -7.0000},
+			{date: '03-May', lng: -114.6667, lat: -7.7833},
+			{date: '07-May', lng: -126.8333, lat: -8.8333},
+			{date: '08-May', lng: -129.2153, lat: -9.0024},
+			{date: '10-May', lng: -134.6534, lat: -8.8502},
+			{date: '17-May', lng: -139.1343, lat: -9.9173},
+			{date: '27-May', lng: -145.5002, lat: -15.8501},
+			{date: '01-Jun', lng: -146.8946, lat: -15.6708},
+			{date: '09-Jun', lng: -139.6917, lat: 35.6895}
+			];
+        
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: uluru[0],
+          mapTypeId: 'satellite'
+        });
+        
+		var icon = {
+			url: "anchor.png", // url
+			scaledSize: new google.maps.Size(30, 30), // scaled size
+			origin: new google.maps.Point(0,0), // origin
+			anchor: new google.maps.Point(15, 15) // anchor
+		};
+		
+
+		infowindow = new google.maps.InfoWindow();
+
+        for (var i=0; i < uluru.length; i++){
+			var marker = new google.maps.Marker({
+			position: uluru[i],
+			map: map,
+			icon: icon,
+			title: uluru[i].date
+			});
+			
+	
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+                    infowindow.setContent(uluru[i].date);
+                    infowindow.open(map, marker);
+                }
+            })(marker, i)); 
+			}
+        
+        var sailPath = new google.maps.Polyline({
+          path: uluru,
+          geodesic: true,
+          strokeColor: '#FFFFFF',
+          strokeOpacity: 0.5,
+          strokeWeight: 2
+        });
+
+        sailPath.setMap(map);
+      }
+    </script>
+    
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkhfSRYvjtMmkeHVFzLY4qg6JPoNqVxYw&callback=initMap">
+    </script>
+  </body>
+</html>
