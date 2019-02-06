@@ -1,84 +1,281 @@
-<!--https://developers.google.com/maps/documentation/javascript/-->
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-       #map {
-        height: 800px;
-        width: 100%;
-       }
-    </style>
-  </head>
-  <body>
+<head>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+	<meta charset="utf-8">
+	<title>Profile Maker</title>
+	<style>
 
-    <div id="map"></div>
-    <script>
-      function initMap() {
-      
-        var uluru = [
-			{date: '17-Apr', lng: -79.5167, lat: 8.6500},
-			{date: '21-Apr', lng: -84.4667, lat: 2.4667},
-			{date: '25-Apr', lng: -92.4500, lat: -3.6500},
-			{date: '29-Apr', lng: -103.7000, lat: -7.0000},
-			{date: '03-May', lng: -114.6667, lat: -7.7833},
-			{date: '07-May', lng: -126.8333, lat: -8.8333},
-			{date: '08-May', lng: -129.2153, lat: -9.0024},
-			{date: '10-May', lng: -134.6534, lat: -8.8502},
-			{date: '17-May', lng: -139.1343, lat: -9.9173},
-			{date: '27-May', lng: -145.5002, lat: -15.8501},
-			{date: '01-Jun', lng: -146.8946, lat: -15.6708},
-			{date: '09-Jun', lng: -139.6917, lat: 35.6895}
-			];
-        
-        
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 2,
-          center: uluru[0],
-          mapTypeId: 'satellite'
-        });
-        
-		var icon = {
-			url: "anchor.png", // url
-			scaledSize: new google.maps.Size(30, 30), // scaled size
-			origin: new google.maps.Point(0,0), // origin
-			anchor: new google.maps.Point(15, 15) // anchor
-		};
-		
+	#map {
+		height: 100%;
+	}
+	/* Optional: Makes the sample page fill the window. */
+	html, body {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+	}
 
-		infowindow = new google.maps.InfoWindow();
+	p {	
+		margin: 0;
+		padding: 1px;
+	}
 
-        for (var i=0; i < uluru.length; i++){
-			var marker = new google.maps.Marker({
-			position: uluru[i],
-			map: map,
-			icon: icon,
-			title: uluru[i].date
-			});
-			
+	.scrollabletextbox {
+
+    font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
+    font-size: 82%;
+    overflow:scroll;
+	}
+
+</style>
+<script src="https://www.google.com/jsapi"></script>
+</head>
+<body>
+	<div id="header" style="height:250px;">
+	<div id="control" style="width:40%; float: left;">
+		<table>
+			<tr>
+				<th>Points</th>
+				<th>Latitude</th>
+				<th>Longitude</th>
+			</tr>
+			<tr>
+				<td>Aval</td>
+				<td><input type="text" id="bot_lat" size="10" value="" readonly></td>
+				<td><input type="text" id="bot_lng" size="10" value="" readonly></td>
+			</tr>
+			<tr>
+				<td>Amont</td>
+				<td><input type="text" id="top_lat" size="10" value="" readonly></td>
+				<td><input type="text" id="top_lng" size="10" value="" readonly></td>
+			</tr>
+		</table>
+
+
 	
-            google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                return function () {
-                    infowindow.setContent(uluru[i].date);
-                    infowindow.open(map, marker);
-                }
-            })(marker, i)); 
-			}
-        
-        var sailPath = new google.maps.Polyline({
-          path: uluru,
-          geodesic: true,
-          strokeColor: '#FFFFFF',
-          strokeOpacity: 0.5,
-          strokeWeight: 2
-        });
+	<p>Nombre de points: <input type="text" id="nb_pts" size="6" value="11" onChange="nbpts_change()"> points</p>
+	<p id="dist">Longueurs du profil:</p>
+	<p id="espacement">Espacement des point:</p>
+	<button type="button" id="getElevationBtn" onclick="getElevation()" style="display: none;">Get Elevation</button>
+	<button type="button" id="exportDataBtn" onclick="alert('Export')" style="display: none;">Export to csv</button>
+	</div> 
+	<div id="result" style="width:60%; float: right;">
+		<textarea class="scrollabletextbox" id="data_output" rows="14" cols="100" readonly></textarea>
+	</div>
+	</div>
+	<div id="map" style="height:700px"></div>
+	
+	<script>
+var map;
+var d;
+var esp;
+var intermediate_pts = [];
 
-        sailPath.setMap(map);
-      }
-    </script>
-    
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkhfSRYvjtMmkeHVFzLY4qg6JPoNqVxYw&callback=initMap">
-    </script>
-  </body>
+
+
+function initMap() {
+	clearField();
+	var myCenter = new google.maps.LatLng(53, -90);
+	var myOptions = {zoom: 4,mapTypeId: google.maps.MapTypeId.SATELLITE,center: myCenter};
+	map = new google.maps.Map(document.getElementById("map"), myOptions);
+	polyLine = new google.maps.Polyline({map: null});
+	startMarker = new google.maps.Marker({map:null});
+	endMarker = new google.maps.Marker({map:null});
+	startPoint = null;
+	endPoint = null;
+	elevator = new google.maps.ElevationService;
+	map.addListener('click', mapClick );
+}
+
+var mapClick  =function(e) {
+
+	var lat = e.latLng.lat();
+	var lng = e.latLng.lng();
+	var position = {lat: lat, lng: lng};
+	if(! startPoint) {
+		startPoint = position;
+		document.getElementById("exportDataBtn").style.display = "None"
+		document.getElementById("getElevationBtn").style.display = "None"
+		clearMarker();
+		clearElevationMarkers();
+		clearPolyline();
+		clearField();
+
+		startMarker = makeMarker(position,6,true,"blue");
+		startMarker.addListener('drag', dragMarker);
+		startMarker.addListener('dragend', dragendMarker);
+	}
+	else if(! endPoint) {
+		endPoint = position;
+		endMarker = makeMarker(position,6,true,"red");
+		endMarker.addListener('drag', dragMarker);
+		endMarker.addListener('dragend', dragendMarker);
+		polyLine = makePolyline([startPoint, endPoint]);
+		computeProfilSpec();
+		writeField()
+		document.getElementById("getElevationBtn").style.display = "inline"
+		startPoint = null;
+		endPoint = null;
+
+	}
+}
+
+function dragMarker(){
+	clearPolyline();
+	clearField();
+	document.getElementById("exportDataBtn").style.display = "None"
+	clearElevationMarkers();
+	var s = {lat: startMarker.position.lat(), lng: startMarker.position.lng()};
+	var e = {lat: endMarker.position.lat(), lng: endMarker.position.lng()};
+	polyLine = makePolyline([s, e]);
+}
+
+function dragendMarker(){
+	computeProfilSpec();
+	writeField();	
+}
+
+function nbpts_change(){
+	if (startMarker && endMarker){
+		clearField();
+		clearElevationMarkers();
+		computeProfilSpec();
+		writeField();
+		document.getElementById("exportDataBtn").style.display = "None";
+	}
+
+
+}
+
+function makeMarker(pos,s,d,c){
+	return new google.maps.Marker({
+			position: pos,
+			map: map,
+			draggable:d,
+			icon: {path: google.maps.SymbolPath.CIRCLE,
+				scale: s,
+				fillColor: c,
+				fillOpacity: 1,
+				strokeWeight: 1,
+				strokeColor: c,}
+		});
+}
+
+function makePolyline(points) {
+		return new google.maps.Polyline({
+			path: points,
+			strokeColor: 'black',
+			strokeOpacity: 0.7,
+			strokeWeight: 1,
+			map: map
+		});
+	};
+
+
+
+function radians(n) {return n * (Math.PI / 180);}
+function degrees(n) {return n * (180 / Math.PI);}
+
+var computeProfilSpec = function(){
+		nbPts = Number(document.getElementById("nb_pts").value);
+		computeLength();
+		computeSpacing();	
+}
+
+var computeLength = function(){
+	var R = 6378137; // Earth’s mean radius in meter
+	var dLat = radians(endMarker.position.lat() - startMarker.position.lat());
+	var dLong = radians(endMarker.position.lng() - startMarker.position.lng());
+	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+	Math.cos(radians(startMarker.position.lat())) * Math.cos(radians(endMarker.position.lat())) *
+	Math.sin(dLong / 2) * Math.sin(dLong / 2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	d = R * c;
+	d = d.toFixed(2);
+}
+
+var computeSpacing = function(){
+	esp = d/(nbPts-1);	
+}
+
+var writeField = function(){
+
+	document.getElementById("bot_lat").value = Number(startMarker.position.lat()).toFixed(5);
+	document.getElementById("bot_lng").value = Number(startMarker.position.lng()).toFixed(5);
+	document.getElementById("top_lat").value = Number(endMarker.position.lat()).toFixed(5);
+	document.getElementById("top_lng").value = Number(endMarker.position.lng()).toFixed(5);
+	document.getElementById("dist").innerHTML = 'Longueurs du profil: '+Number(d).toFixed(2)+'  m';
+	document.getElementById("espacement").innerHTML = 'Espacement des point: '+Number(esp).toFixed(2)+' m';
+}
+
+var clearMarker = function(){
+	startMarker.setMap(null);
+	endMarker.setMap(null);
+}
+
+var clearElevationMarkers = function(){
+ 	var i;
+	for(i=0;i < intermediate_pts.length; i++) {
+		intermediate_pts[i].setMap(null);
+	}
+	intermediate_pts = []	
+}
+
+var clearPolyline = function(){
+	polyLine.setMap(null);
+}
+
+var clearField = function(){
+	document.getElementById("data_output").value = ""
+	document.getElementById("top_lat").value = "";
+	document.getElementById("top_lng").value = "";
+	document.getElementById("bot_lat").value = "";
+	document.getElementById("bot_lng").value = "";
+	document.getElementById("dist").innerHTML = "Longueurs du profil:";
+	document.getElementById("espacement").innerHTML = "Espacement des point:";
+};
+
+
+function getElevation(){
+	var s = {lat: startMarker.position.lat(), lng: startMarker.position.lng()};
+	var e = {lat: endMarker.position.lat(), lng: endMarker.position.lng()};
+	elevator.getElevationAlongPath({'path': [s,e],'samples': nbPts}, plotElevation);
+	//document.getElementById("exportDataBtn").style.display = "inline"
+
+}
+
+function plotElevation(elevations, status) {
+	var i;
+	var t;
+	var text_data='PointNo;X;Z;HSMax;HSMin;Ql;Qr;Description\r\n';
+	for (i = 0; i < elevations.length; i++) { 
+		lat = elevations[i]['location'].lat();
+		lng = elevations[i]['location'].lng();
+		elev = elevations[i]['elevation'];
+		t = i+';'+Number(i*esp).toFixed(3)+';'+Number(elev).toFixed(3)+';0;0;0;0;\r\n'
+		
+		text_data += t;
+		console.log(t);
+		if (i != 0 && i !=elevations.length-1){
+			var j = makeMarker(elevations[i]['location'],4,false,"black");
+			intermediate_pts.push(j);
+		}
+	}
+	document.getElementById("data_output").value = text_data;
+	var csvData = "data:text/csv;charset=utf-8," + text_data;
+	//dl = "data:text/csv;charset=utf-8," + text_data;
+	var encodedUri = encodeURI(csvData);
+	window.open(encodedUri);
+
+}
+
+
+
+
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBA2pe-p3q2i_Pl9H2P2r3LsRlCHYfx1Qs&callback=initMap">
+</script>
+</body>
 </html>
