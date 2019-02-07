@@ -168,6 +168,7 @@ function initMap() {
 	elevator = new google.maps.ElevationService;
 	map.addListener('click', mapClick );
     var input = document.getElementById('pac-input');
+	input.value="";
     var searchBox = new google.maps.places.SearchBox(input);
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
