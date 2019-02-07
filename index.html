@@ -112,8 +112,9 @@
 <script src="https://www.google.com/jsapi"></script>
 </head>
 <body>
-	<div id="header" style="height:25%; width:100%">
-	<div id="control" style="width:30%; float: left;">
+	<div id="header" style="height:30%; width:100%">
+	<div id="control" style="width:25%; float: left;">
+		<img src="Doppelmayr_logo.png" alt="logo" width=55%>
 		<table>
 			<tr>
 				<th>Points</th>
@@ -133,19 +134,21 @@
 		</table>
 
 
-	
+	<br>
 	<p>Nombre de points: <input type="text" id="nb_pts" size="6" value="11" onChange="nbpts_change()"> points</p>
 	<p id="dist">Longueurs du profil:</p>
 	<p id="espacement">Espacement des point:</p>
-	<button type="button" id="getElevationBtn" onclick="getElevation()" style="display: none;">Get Elevation</button>
+	<br>
+	<button type="button" id="getElevationBtn" onclick="getElevation()" style="display: none;">Get Elevations</button>
 	<button type="button" id="exportDataBtn" onclick="downloadCSV()" style="display: none;">Export to csv</button>
 	</div> 
-	<div id="result" style="width:70%; float: right;">
+	<div id="result" style="width:75%; float: left;">
 		<textarea class="scrollabletextbox" id="data_output" rows="10" cols="100" readonly style="width:100%; height:100%; float: center;"></textarea>
 	</div>
+
 	</div>
 	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
-	<div id="map" style="height:75%"></div>
+	<div id="map" style="height:70%"></div>
 	
 	<script>
 var map;
@@ -170,7 +173,7 @@ function initMap() {
     var input = document.getElementById('pac-input');
 	input.value="";
     var searchBox = new google.maps.places.SearchBox(input);
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+    map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(input);
 
     map.addListener('bounds_changed', function() {
     	searchBox.setBounds(map.getBounds());
