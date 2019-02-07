@@ -138,7 +138,7 @@
 	<p id="dist">Longueurs du profil:</p>
 	<p id="espacement">Espacement des point:</p>
 	<button type="button" id="getElevationBtn" onclick="getElevation()" style="display: none;">Get Elevation</button>
-	<button type="button" id="exportDataBtn" onclick="alert('Export')" style="display: none;">Export to csv</button>
+	<button type="button" id="exportDataBtn" onclick="downloadCSV()" style="display: none;">Export to csv</button>
 	</div> 
 	<div id="result" style="width:70%; float: right;">
 		<textarea class="scrollabletextbox" id="data_output" rows="10" cols="100" readonly style="width:100%; height:100%; float: center;"></textarea>
@@ -355,14 +355,14 @@ function getElevation(){
 	var s = {lat: startMarker.position.lat(), lng: startMarker.position.lng()};
 	var e = {lat: endMarker.position.lat(), lng: endMarker.position.lng()};
 	elevator.getElevationAlongPath({'path': [s,e],'samples': nbPts}, plotElevation);
-	//document.getElementById("exportDataBtn").style.display = "inline"
+	document.getElementById("exportDataBtn").style.display = "inline"
 
 }
 
 function plotElevation(elevations, status) {
 	var i;
 	var t;
-	var text_data='PointNo;X;Z;HSMax;HSMin;Ql;Qr;Description\r\n';
+	text_data='PointNo;X;Z;HSMax;HSMin;Ql;Qr;Description\r\n';
 	for (i = 0; i < elevations.length; i++) { 
 		lat = elevations[i]['location'].lat();
 		lng = elevations[i]['location'].lng();
@@ -377,14 +377,16 @@ function plotElevation(elevations, status) {
 		}
 	}
 	document.getElementById("data_output").value = text_data;
+
+
+}
+
+function downloadCSV(){
 	var csvData = "data:text/csv;charset=utf-8," + text_data;
 	//dl = "data:text/csv;charset=utf-8," + text_data;
 	var encodedUri = encodeURI(csvData);
 	window.open(encodedUri);
-
 }
-
-
 
 
 </script>
