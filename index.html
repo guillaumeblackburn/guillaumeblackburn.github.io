@@ -12,14 +12,94 @@
 	/* Optional: Makes the sample page fill the window. */
 	html, body {
 		height: 100%;
+
 		margin: 0;
 		padding: 0;
+		font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
 	}
 
 	p {	
 		margin: 0;
 		padding: 1px;
 	}
+
+	textarea
+	{
+	resize:none;
+	}
+
+    #description {
+    	font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+    }
+
+      #infowindow-content .title {
+        font-weight: bold;
+      }
+
+      #infowindow-content {
+        display: none;
+      }
+
+      #map #infowindow-content {
+        display: inline;
+      }
+
+      .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+      }
+
+      #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+      }
+
+      .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+      }
+
+      .pac-controls label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 400px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }
+      #target {
+        width: 345px;
+      }    
 
 	.scrollabletextbox {
 
@@ -32,8 +112,8 @@
 <script src="https://www.google.com/jsapi"></script>
 </head>
 <body>
-	<div id="header" style="height:250px;">
-	<div id="control" style="width:40%; float: left;">
+	<div id="header" style="height:25%; width:100%">
+	<div id="control" style="width:30%; float: left;">
 		<table>
 			<tr>
 				<th>Points</th>
@@ -60,11 +140,12 @@
 	<button type="button" id="getElevationBtn" onclick="getElevation()" style="display: none;">Get Elevation</button>
 	<button type="button" id="exportDataBtn" onclick="alert('Export')" style="display: none;">Export to csv</button>
 	</div> 
-	<div id="result" style="width:60%; float: right;">
-		<textarea class="scrollabletextbox" id="data_output" rows="14" cols="100" readonly></textarea>
+	<div id="result" style="width:70%; float: right;">
+		<textarea class="scrollabletextbox" id="data_output" rows="10" cols="100" readonly style="width:100%; height:100%; float: center;"></textarea>
 	</div>
 	</div>
-	<div id="map" style="height:700px"></div>
+	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
+	<div id="map" style="height:75%"></div>
 	
 	<script>
 var map;
@@ -86,6 +167,38 @@ function initMap() {
 	endPoint = null;
 	elevator = new google.maps.ElevationService;
 	map.addListener('click', mapClick );
+    var input = document.getElementById('pac-input');
+    var searchBox = new google.maps.places.SearchBox(input);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    map.addListener('bounds_changed', function() {
+    	searchBox.setBounds(map.getBounds());
+    });
+
+map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
+        });
+        searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+
+          if (places.length == 0) {
+            return;
+          }
+          var bounds = new google.maps.LatLngBounds();
+          places.forEach(function(place) {
+            if (!place.geometry) {
+              console.log("Returned place contains no geometry");
+              return;
+            }
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
+        });
 }
 
 var mapClick  =function(e) {
@@ -275,7 +388,7 @@ function plotElevation(elevations, status) {
 
 </script>
 <script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBA2pe-p3q2i_Pl9H2P2r3LsRlCHYfx1Qs&callback=initMap">
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBA2pe-p3q2i_Pl9H2P2r3LsRlCHYfx1Qs&libraries=places&callback=initMap">
 </script>
 </body>
 </html>
