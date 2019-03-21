@@ -30,13 +30,13 @@ th {
 
 #map {
   height: 100%;
-  width:60%;
+  width:70%;
   float:right;
 }
 
 #param {
   height: 100%;
-  width:39%;
+  width:29%;
   float:left;
   padding-left:10px;
 }
