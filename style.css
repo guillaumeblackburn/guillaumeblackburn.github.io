@@ -1,0 +1,181 @@
+
+#map {
+  height: 100%;
+}
+
+html, body {
+  font-family: Roboto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y:hidden;
+}
+
+#floating-panel {
+  position: absolute;
+  width: 20%;
+  height: 100%;
+  top: 0%;
+  left: 0%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 1px;
+  border: 1px solid #999;
+  text-align: left;
+  font-family: 'Roboto','sans-serif';
+  line-height: 20px;
+  padding-left: 5px;
+  font-size: 75%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#elevation-table{
+  position: absolute;
+  top: 0%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 1px;
+  border: 1px solid #999;
+  text-align: left;
+  font-family: 'Roboto','sans-serif';
+  line-height: 20px;
+  padding-left: 5px;
+  font-size: 75%;
+  overflow: auto;
+  display: none;
+}
+
+#profile{
+  position: absolute;
+  top: 0%;
+  z-index: 5;
+  background-color: #fff;
+  padding: 1px;
+  border: 1px solid #999;
+  text-align: left;
+  font-family: 'Roboto','sans-serif';
+  line-height: 20px;
+  padding-left: 5px;
+  font-size: 75%;
+  overflow: auto;
+  display:none;
+}
+
+#msgBox{
+  position: absolute;
+  bottom: 0%;
+  margin: 0 auto;
+  width:100%;
+  text-align: center;
+  z-index: 5;
+  padding: 1px;
+  font-family: 'Roboto','sans-serif';
+  line-height: 20px;
+  font-size: 75%;
+  display:none;
+  background-color: rgb(212, 89, 89);
+}
+
+#units{
+  border: 0px solid;
+  width:100%;
+}
+
+input, form {
+  border: 0.6px solid gray;
+  float: right;
+  width: 90px;
+  text-align:right;
+  font-size: 14px;
+}
+
+.readonly{
+  border: 0px solid
+}
+
+
+button {
+  width:70%;
+  border-radius: 8px;
+}
+
+#infowindow-content .title {
+  font-weight: bold;
+}
+
+#infowindow-content {
+  display: none;
+}
+
+#map #infowindow-content {
+  display: inline;
+}
+
+.pac-card {
+  margin: 10px 10px 0 0;
+  border-radius: 2px 0 0 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  font-family: Roboto;
+}
+
+#pac-container {
+  padding-bottom: 12px;
+  margin-right: 12px;
+}
+
+.pac-controls {
+  display: inline-block;
+  padding: 5px 11px;
+}
+
+.pac-controls label {
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 300;
+}
+
+#pac-input {
+  background-color: #fff;
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 300;
+  margin-left: 12px;
+  padding: 0 11px 0 13px;
+  text-overflow: ellipsis;
+  width: 150px;
+  text-align: left;
+}
+
+#pac-input:focus {
+  border-color: #4d90fe;}
+
+.blueDot {
+  height: 10px;
+  width: 10px;
+  background-color: blue;
+  border-radius: 50%;
+  display: inline-block;
+  }
+
+.redDot {
+  height: 10px;
+  width: 10px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  }
+
+.control_field{
+  display: block;
+  height:25px;
+}
+
+.btn_field{
+  text-align: center;
+}
+
