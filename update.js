@@ -221,8 +221,8 @@ function update_ts(pos){
   }
 
   function get_elevation_points(){
-    botHub = CL.getPath().Lb[0];
-    topHub = CL.getPath().Lb[1];
+    botHub = CL.getPath().getArray()[0];
+    topHub = CL.getPath().getArray()[1];
     let params = {'path': [botHub,topHub],'samples':PROFILE.nb_elev_points,}
     elevator.getElevationAlongPath(params, draw_elev_points)
   }
